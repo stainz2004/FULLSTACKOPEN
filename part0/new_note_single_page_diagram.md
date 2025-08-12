@@ -1,17 +1,16 @@
-# SPA — Creating a new note
-
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User
     participant Browser
-    participant SPA as "SPA (JavaScript running in browser)"
+    participant Server as "Web Server"
     participant API as "API Server (/api/notes)"
 
-    User->>Browser: Type new note text & click "Save"
-    Browser->>SPA: Pass note content to SPA code
-    SPA->>API: POST /api/notes {"content": "My new note", "date": "..."}
-    API-->>SPA: 201 Created {"id": 123, "content": "My new note", "date": "..."}
-    SPA->>API: GET /api/notes
-    API-->>SPA: 200 OK [ Updated JSON notes list ]
-    SPA-->>Browser: Update UI to show new note
+    Browser->>Server: GET /exampleapp/spa
+    Server-->>Browser: 200 OK (HTML)
+    Browser->>Server: GET /exampleapp/main.css
+    Server-->>Browser: 200 OK (CSS)
+    Browser->>Server: GET /exampleapp/spa.js
+    Server-->>Browser: 200 OK (JavaScript)
+    Browser->>API: GET /api/notes
+    API-->>Browser: 200 OK [ JSON list of notes ]
+    Browser-->>Browser: Render SPA UI with notes
