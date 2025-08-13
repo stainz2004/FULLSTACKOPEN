@@ -1,59 +1,44 @@
-const Header = (props) => {
-  return (
-    <h1>{props.course.name}</h1>
-  )
-}
+import { useState } from 'react'
 
-const Content = (content) => {
-  console.log(content.parts.parts[0].name)
-
+const History = (props) => {
+  if (props.allClicks.length === 0) {
+    return (
+      <div>
+        the app is used by pressing the buttons
+      </div>
+    )
+  }
   return (
     <div>
-      <Part text = {content.parts.parts[0].name} number = {content.parts.parts[0].exercises}></Part>
-      <Part text = {content.parts.parts[1].name} number = {content.parts.parts[1].exercises}></Part>
-      <Part text = {content.parts.parts[2].name} number = {content.parts.parts[2].exercises}></Part>
+      button press history: {props.allClicks.join(' ')}
     </div>
   )
 }
 
-const Total = (numbers) => {
+const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
-  return (
-    <p>Number of exercises {numbers.parts.parts[0].exercises + numbers.parts.parts[1].exercises + numbers.parts.parts[2].exercises}</p>
-  )
-}
-
-const Part = (info) => {
-
-  return (
-    <p>{info.text} {info.number}</p>
-  )
-}
 
 const App = () => {
-  const course = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7
-      },
-      {
-        name: 'State of a component',
-        exercises: 14
-      }
-    ]
+  const [left, setLeft] = useState(0)
+  const [right, setRight] = useState(0)
+  const [allClicks, setAll] = useState([])
+
+  const handleLeftClick = () => {
+    setAll(allClicks.concat('L'))
+    setLeft(left + 1)
   }
 
+  const handleRightClick = () => {
+    setAll(allClicks.concat('R'))
+    setRight(right + 1)
+  }
   return (
     <div>
-      <Header course = {course}/>
-      <Content parts = {course}/>
-      <Total parts = {course}/>
+      {left}
+      <Button onClick={handleLeftClick} text='left' />
+      <Button onClick={handleRightClick} text='right' />
+      {right}
+      <History allClicks={allClicks} />
     </div>
   )
 }
