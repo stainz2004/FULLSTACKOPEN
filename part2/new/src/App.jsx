@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import notes from './services/notes'
 
 const Filter = ({ value, setNewNameSearch}) => {
   const handleNameSearchChange = (event) => {
-    console.log(event.target.value)
     setNewNameSearch(event.target.value)
   }
 
@@ -15,12 +15,10 @@ const Filter = ({ value, setNewNameSearch}) => {
 const Forms = ({setNewName, setNewNumber, onSubmit, nameValue, numberValue}) => {
 
   const handleNameChange = (event) => {
-      console.log(event.target.value)
       setNewName(event.target.value)
     }
 
   const handleNumberChange = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
 
@@ -33,46 +31,81 @@ const Forms = ({setNewName, setNewNumber, onSubmit, nameValue, numberValue}) => 
   )
 }
 
-const Persons = ({persons, newNameSearch}) => {
+const Persons = ({persons, newNameSearch, deleteName}) => {
   return (
     persons.map(person => person.name.toLowerCase().includes(newNameSearch.toLowerCase()) &&
-       <p key={person.name}>{person.name} {person.number} {person.id}</p>)
+       <p key={person.name}>
+        {person.name} {person.number}
+        <button onClick={() => deleteName(person.id)}> Delete</button>
+        </p>)
   )
 }
 
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
-  const [id, setNewId] = useState(persons.length + 1)
   const [newNameSearch, setNewNameSearch] = useState('')
 
   const submitDetails = (event) => {
     event.preventDefault()
     const names = persons.map(person => person.name);
-    console.log(names)
     if (names.includes(newName)) {
-      alert(newName + ' is already added to phonebook')
+      const object = persons.find(person => person.name === newName)
+      changeDetails(object.id)
       return
     }
     const nameObject = {
       name : newName,
       number : newNumber,
-      id : id
     }
-    setPersons(persons.concat(nameObject))
-    setNewName('')
-    setNewNumber('')
-    setNewId(id + 1)
+
+    notes.create(nameObject)
+    .then(response => {
+      setPersons(persons.concat(response))
+      setNewName('')
+      setNewNumber('')
+    }
+    )
   }
 
-  
+  const deleteName = (id) => {
+    if (window.confirm('DO YOU WANT TO DELETE THIS?')) {
+        notes.deleteId(id)
+        .then(response => {
+        setPersons(persons.filter(person => person.id !== id))
+        })
+        .catch(error => {
+          alert('Failed to delete the person')
+        })
+    }
+  }
+
+  const changeDetails = (id) => {
+    const newObject = {
+      name : newName,
+      number : newNumber,
+    }
+    if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+      notes.update(id, newObject)
+      .then(response => {
+        console.log(response)
+        setPersons(persons.map(person => person.id === id ? response : person))
+        setNewName('')
+        setNewNumber('')
+      })
+    }
+  }
+
+
+
+  useEffect(() => {
+    notes.getAll()
+    .then(response => {
+      setPersons(response)
+    })
+  }, [])
 
   
 
@@ -84,7 +117,7 @@ const App = () => {
       <Forms onSubmit={submitDetails} setNewName={setNewName} setNewNumber={setNewNumber}
       nameValue={newName} numberValue={newNumber}></Forms>
       <h2>Numbers</h2>
-      <Persons persons={persons} newNameSearch={newNameSearch}></Persons>
+      <Persons persons={persons} newNameSearch={newNameSearch} deleteName={deleteName}></Persons>
     </div>
   )
 }
