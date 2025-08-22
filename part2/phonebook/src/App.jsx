@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import notes from './services/notes'
+import Notification from './components/Notification'
 
 const Filter = ({ value, setNewNameSearch}) => {
   const handleNameSearchChange = (event) => {
@@ -47,6 +48,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newNameSearch, setNewNameSearch] = useState('')
+  const [newMessage, setNewMessage] = useState(null)
+  const [newMessageType, setNewMessageType] = useState('error')
 
   const submitDetails = (event) => {
     event.preventDefault()
@@ -66,6 +69,13 @@ const App = () => {
       setPersons(persons.concat(response))
       setNewName('')
       setNewNumber('')
+      setNewMessageType('success')
+      setNewMessage(
+          `Added '${response.name}'`
+        )
+        setTimeout(() => {
+          setNewMessage(null)
+        }, 5000)
     }
     )
   }
@@ -73,11 +83,17 @@ const App = () => {
   const deleteName = (id) => {
     if (window.confirm('DO YOU WANT TO DELETE THIS?')) {
         notes.deleteId(id)
-        .then(response => {
+        .then(() => {
         setPersons(persons.filter(person => person.id !== id))
         })
-        .catch(error => {
-          alert('Failed to delete the person')
+        .catch(() => {
+          setNewMessageType('error')
+          setNewMessage(
+              `Information of '${ persons.find(person => person.id === id).name}' has already been removed.`
+            )
+            setTimeout(() => {
+              setNewMessage(null)
+            }, 5000)
         })
     }
   }
@@ -94,6 +110,13 @@ const App = () => {
         setPersons(persons.map(person => person.id === id ? response : person))
         setNewName('')
         setNewNumber('')
+        setNewMessageType('success')
+      setNewMessage(
+          `'${response.name}' number has been changed.`
+        )
+        setTimeout(() => {
+          setNewMessage(null)
+        }, 5000)
       })
     }
   }
@@ -112,6 +135,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={newMessage} type={newMessageType}></Notification>
       <Filter setNewNameSearch={setNewNameSearch} value={newNameSearch}></Filter>
       <h2>add a new</h2>
       <Forms onSubmit={submitDetails} setNewName={setNewName} setNewNumber={setNewNumber}
