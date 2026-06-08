@@ -20,10 +20,11 @@ interface ErrorResponse {
 }
 
 const app = express();
+app.use(express.json());
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-app.post('/exercises', (req:  Request<{}, {}, ExerciseRequest>, res: Response<TrainingResponse | ErrorResponse>) => {
-    const { daily_exercises, target} = req.body;
+app.post('/exercises', (req:  Request<{}, {}, ExerciseRequest, {}>, res: Response<TrainingResponse | ErrorResponse>) => {
+    const { daily_exercises, target } = req.body;
 
     if (!daily_exercises || target === undefined) {
         res.status(400).send({ error: 'parameters missing' });
@@ -32,7 +33,7 @@ app.post('/exercises', (req:  Request<{}, {}, ExerciseRequest>, res: Response<Tr
 
     try {
         const result = calculateExercises(target, daily_exercises);
-        res.send(result);
+        res.status(200).send(result);
     } catch (e: unknown) {
         res.status(400).send({ error: (e as Error).message });
     }

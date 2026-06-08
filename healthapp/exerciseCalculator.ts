@@ -21,8 +21,8 @@ export const calculateExercises = (target: number, arr: number[]): TrainingRespo
 
     const isAllNumbers = arr.every(item => typeof item === 'number' && !isNaN(item));
 
-    if (!isAllNumbers) {
-        throw new Error("ERRRROOOOOR");
+    if (!isAllNumbers || isNaN(target)) {
+        throw new Error("malformatted parameters");
     }
 
     const periodLength = arr.length;
@@ -53,9 +53,3 @@ export const calculateExercises = (target: number, arr: number[]): TrainingRespo
 
     return response;
 };
-
-const target = Number(process.argv[2]);
-const hours: number[] = process.argv.slice(3).map(Number);
-
-
-console.log(calculateExercises(target, hours));
