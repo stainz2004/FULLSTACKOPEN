@@ -1,16 +1,16 @@
 
 
 // weight // height
-const calculator = (weight: number, height: number): string => {
+export const bmiCalculator = (weight: number, height: number): string => {
     const bmi: number = weight / Math.pow(height / 100, 2);
     if (bmi < 18.5) {
         return "Underweight";
     } else if (bmi <= 24.9) {
-        return "Normal"
+        return "Normal";
     } else if (bmi <= 29.9) {
-        return "Overweight"
-    } else {
-        return "Obese"
+        return "Overweight";
+    } else {;
+        return "Obese";
     }
 }
 
@@ -22,4 +22,3 @@ if (isNaN(weight) || isNaN(height)) {
     process.exit(1);
 }
 
-console.log(calculator(weight, height));
