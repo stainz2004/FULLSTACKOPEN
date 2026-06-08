@@ -1,16 +1,21 @@
-interface TrainingResponse {
-    periodLength: number,
-    trainingDays: number,
-    success: boolean,
-    rating: number,
-    ratingDescription: string,
-    target: number,
+export interface TrainingResponse {
+    periodLength: number
+    trainingDays: number
+    success: boolean
+    rating: number
+    ratingDescription: string
+    target: number
     average: number
+}
+
+export interface ExerciseRequest {
+    daily_exercises: number[]
+    target: number
 }
 
 
 
-const calculateExercises = (target: number, arr: number[]): TrainingResponse => {
+export const calculateExercises = (target: number, arr: number[]): TrainingResponse => {
     let rating: number;
     let ratingDescription: string;
 
@@ -37,17 +42,17 @@ const calculateExercises = (target: number, arr: number[]): TrainingResponse => 
     }
 
     const response: TrainingResponse = {
-        periodLength: periodLength,
-        trainingDays: trainingDays,
+        periodLength,
+        trainingDays,
         success: averageTrainingTime >= target,
-        rating: rating,
-        ratingDescription: ratingDescription,
-        target: target,
+        rating,
+        ratingDescription,
+        target,
         average: averageTrainingTime
-    }
+    };
 
     return response;
-}
+};
 
 const target = Number(process.argv[2]);
 const hours: number[] = process.argv.slice(3).map(Number);

@@ -12,13 +12,4 @@ export const bmiCalculator = (weight: number, height: number): string => {
     } else {;
         return "Obese";
     }
-}
-
-const weight = Number(process.argv[2]);
-const height = Number(process.argv[3]);
-
-if (isNaN(weight) || isNaN(height)) {
-    console.log("Please provide valid numbers: ts-node bmiCalculator.ts <weight> <height>");
-    process.exit(1);
-}
-
+};

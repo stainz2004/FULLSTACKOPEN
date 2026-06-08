@@ -2,6 +2,7 @@ import express from 'express';
 import { bmiCalculator } from './bmiCalculator.ts';
 import { Request, Response } from 'express';
 import { calculator, type Operation } from './calculator.ts';
+import { type TrainingResponse, calculateExercises, type ExerciseRequest } from './exerciseCalculator.ts';
 
 interface BmiQuery {
     height: string
@@ -19,6 +20,23 @@ interface ErrorResponse {
 }
 
 const app = express();
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+app.post('/exercises', (req:  Request<{}, {}, ExerciseRequest>, res: Response<TrainingResponse | ErrorResponse>) => {
+    const { daily_exercises, target} = req.body;
+
+    if (!daily_exercises || target === undefined) {
+        res.status(400).send({ error: 'parameters missing' });
+        return;
+    }
+
+    try {
+        const result = calculateExercises(target, daily_exercises);
+        res.send(result);
+    } catch (e: unknown) {
+        res.status(400).send({ error: (e as Error).message });
+    }
+});
 
 app.post('/calculate', (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment 
@@ -40,6 +58,7 @@ app.get('/hello', (_req, res) => {
     res.send("Hello Full Stack!");
 });
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 app.get('/bmi', (req: Request<{}, {}, {}, BmiQuery>, res: Response<BmiQueryResponse | ErrorResponse>) => {
     const weight = Number(req.query.weight);
     const height = Number(req.query.height);
@@ -60,7 +79,7 @@ app.get('/bmi', (req: Request<{}, {}, {}, BmiQuery>, res: Response<BmiQueryRespo
     res.status(200).send(response);
 });
 
-const PORT = 3003;
+const PORT = 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
